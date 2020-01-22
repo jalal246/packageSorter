@@ -1,0 +1,18 @@
+{
+  "name": "package-sorter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/jalal246/packageSorter.git",
+  "author": "Jalal Maskoun <jimmy002020@gmail.com>",
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-import": "^2.20.0",
+    "prettier": "^1.19.1"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0"
+  }
+}
