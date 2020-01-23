@@ -8,8 +8,11 @@ let coreDep;
  * @returns {boolean}
  */
 function isInFiltered(dep) {
+  /**
+   * Check if dependency already added, using name package matching.
+   */
   const match = sorted.find(({ name }) => name === dep);
-  return typeof match === "string";
+  return typeof match === "object";
 }
 
 /**
@@ -25,13 +28,21 @@ function isInFiltered(dep) {
  * @returns {boolean}
  */
 function isAddPackage(packageDeps) {
-  Object.keys(packageDeps).forEach(dep => {
-    if (dep.includes(coreDep)) {
-      return isInFiltered(dep);
-    }
+  let isAdd = true;
 
-    return true;
-  });
+  const packageDepsArr = Object.keys(packageDeps);
+
+  for (let i = 0; i < packageDepsArr.length; i += 1) {
+    const dep = packageDepsArr[i];
+
+    if (dep.includes(coreDep)) {
+      isAdd = isInFiltered(dep);
+
+      if (isAdd) break;
+    }
+  }
+
+  return isAdd;
 }
 
 /**
@@ -71,8 +82,12 @@ function sort(packages) {
 export default function sortPackages(packages, coreDependency) {
   coreDep = coreDependency;
 
+  let i = 5;
   while (packages.length > 0) {
-    sort();
+    sort(packages);
+
+    i -= 1;
+    if (i === 0) break;
   }
 
   return sorted;
