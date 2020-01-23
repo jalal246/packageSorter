@@ -58,6 +58,7 @@ export default function sortPackages(packages, coreDep) {
    * coreDep, then other packages.
    */
   function sort() {
+    let noChange = false;
     packages.forEach(({ dependencies = {} }, i) => {
       /**
        * Checks if this package is already existed in sorted array or even has
@@ -72,21 +73,17 @@ export default function sortPackages(packages, coreDep) {
          *  remove it from unsorted
          */
         packages.splice(i, 1);
+
+        noChange = true;
       }
     });
+
+    return noChange;
   }
 
-  let i = 0;
-
   while (packages.length > 0) {
-    sort(packages);
-
-    i += 1;
-    if (i === packages.length) {
-      console.log("sorrrrrrry");
-
-      break;
-    }
+    const noChange = sort(packages);
+    if (!noChange) break;
   }
 
   return sorted;
