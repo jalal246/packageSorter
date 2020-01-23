@@ -40,4 +40,56 @@ describe("sortPackages test", () => {
 
     expect(sorted).to.have.members([pkg2, pkg0, pkg1, pkg4, pkg3]);
   });
+
+  it("returns empty array when it all don't have the core-dependency", () => {
+    const pkg10 = {
+      name: "@folo/withcontext",
+      dependencies: {
+        "@folo/eslint": "^0.1.5"
+      }
+    };
+
+    const pkg11 = {
+      name: "@folo/values",
+      dependencies: {
+        "@folo/tools": "^0.1.5"
+      }
+    };
+
+    const pkg12 = {
+      name: "@folo/utils",
+      dependencies: {
+        "@folo/pop": "^0.1.5"
+      }
+    };
+    const packages = [pkg10, pkg11, pkg12];
+    const sorted = sortPackages(packages, "@folo");
+
+    expect(sorted).to.have.members([]);
+  });
+
+  it("returns only packages that able to sort them, ignore the other", () => {
+    const pkg20 = {
+      name: "@folo/withcontext",
+      dependencies: {
+        "@folo/eslint": "^0.1.5"
+      }
+    };
+
+    const pkg21 = {
+      name: "@folo/values",
+      dependencies: {
+        "@folo/tools": "^0.1.5"
+      }
+    };
+
+    const pkg22 = {
+      name: "@folo/tools",
+      dependencies: {}
+    };
+    const packages = [pkg20, pkg21, pkg22];
+    const sorted = sortPackages(packages, "@folo");
+
+    expect(sorted).to.have.members([pkg22, pkg21]);
+  });
 });
