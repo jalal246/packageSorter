@@ -1,4 +1,6 @@
 module.exports = {
+  parser: "babel-eslint",
+
   env: {
     browser: true,
     es6: true
@@ -12,5 +14,16 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: "module"
   },
-  rules: {}
+  rules: {},
+  globals: {
+    // jest: true,
+    describe: true,
+    it: true,
+    // before: true,
+    // after: true,
+    // beforeEach: true,
+    // afterEach: true,
+    // expect: true,
+    // render: true
+  }
 };

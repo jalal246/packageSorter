@@ -5,6 +5,9 @@
   "repository": "https://github.com/jalal246/packageSorter.git",
   "author": "Jalal Maskoun <jimmy002020@gmail.com>",
   "license": "LGPL-3.0",
+  "scripts": {
+    "test": "jest  --watch"
+  },
   "dependencies": {
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -13,6 +16,10 @@
     "prettier": "^1.19.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^25.1.0",
     "jest": "^25.1.0"
   }
 }
