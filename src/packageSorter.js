@@ -6,7 +6,7 @@
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-export default function sortPackages(packages, coreDep) {
+export default function packageSorter(packages, coreDep) {
   const sorted = [];
 
   /**
