@@ -11,7 +11,6 @@
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
     "@babel/register": "^7.8.3",
     "babel-eslint": "^10.0.3",
     "chai": "^4.2.0",
