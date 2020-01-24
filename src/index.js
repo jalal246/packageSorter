@@ -1,1 +1,1 @@
-export { default } from "./packageSorter";
+module.exports = require("./packageSorter");
