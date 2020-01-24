@@ -6,20 +6,23 @@
   "author": "Jalal Maskoun <jimmy002020@gmail.com>",
   "license": "LGPL-3.0",
   "scripts": {
-    "test": "jest  --watch"
+    "test": "mocha -require @babel/register "
   },
   "dependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-import": "^2.20.0",
-    "prettier": "^1.19.1"
+    "@mytools/print": "^0.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
+    "@babel/register": "^7.8.3",
     "babel-eslint": "^10.0.3",
-    "babel-jest": "^25.1.0",
-    "jest": "^25.1.0"
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-import": "^2.20.0",
+    "jest": "^25.1.0",
+    "mocha": "^7.0.0",
+    "prettier": "^1.19.1"
   }
 }
