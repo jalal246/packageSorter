@@ -1,6 +1,6 @@
 {
   "name": "package-sorter",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "index.js",
   "repository": "https://github.com/jalal246/packageSorter.git",
   "author": "Jalal Maskoun <jimmy002020@gmail.com>",
@@ -18,7 +18,6 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-import": "^2.20.0",
-    "jest": "^25.1.0",
     "mocha": "^7.0.0",
     "prettier": "^1.19.1"
   },
