@@ -7,7 +7,7 @@ the project depends on it and so on. You probably want this step to be automated
 so you can use: `package-sorter(unsortedPackages, coreDependency)`.
 
 ```bash
-npm install `package-sorter`
+npm install package-sorter
 ```
 
 ### Example:
