@@ -6,6 +6,8 @@ When you have projects depend on each other. You have to build core first, then
 the project depends on it and so on. You probably want this step to be automated
 so you can use: `package-sorter(unsortedPackages, coreDependency)`.
 
+If `coreDependency` is not passed, `package-sorter` will extract it as `@coreDep/`.
+
 ```bash
 npm install package-sorter
 ```
