@@ -34,9 +34,16 @@ const pkg4 = {
 };
 
 describe("sortPackages test", () => {
-  it("sorts all packages", () => {
+  it("sorts all packages with given core dependency", () => {
     const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
     const sorted = sortPackages(packages, "@folo");
+
+    expect(sorted).to.have.members([pkg2, pkg0, pkg1, pkg4, pkg3]);
+  });
+
+  it("it extracts core dependency if not passed by default then sort", () => {
+    const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
+    const sorted = sortPackages(packages);
 
     expect(sorted).to.have.members([pkg2, pkg0, pkg1, pkg4, pkg3]);
   });
