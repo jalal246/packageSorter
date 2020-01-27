@@ -1,7 +1,7 @@
 function extractCoreDep(packages) {
   let coreDep;
 
-  for (let i = 0; i < packages; i += 1) {
+  for (let i = 0; i < packages.length; i += 1) {
     const packageDeps = packages[i];
 
     const { name } = packageDeps;
