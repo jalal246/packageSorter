@@ -1,3 +1,21 @@
+function extractCoreDep(packages) {
+  let coreDep;
+
+  for (let i = 0; i < packages; i += 1) {
+    const packageDeps = packages[i];
+
+    const { name } = packageDeps;
+
+    if (name.includes("@")) {
+      // eslint-disable-next-line
+      coreDep = name.split("/")[0];
+      break;
+    }
+  }
+
+  return coreDep;
+}
+
 /**
  * Sorting packages. Package with no deps will come first, then package that
  * depending of package that is built. This is essential for monorepo build.
@@ -6,8 +24,10 @@
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-function packageSorter(packages, coreDep) {
+function packageSorter(packages, coreDep = extractCoreDep(packages)) {
   const sorted = [];
+
+  if (!coreDep) return [];
 
   /**
    * Checks if targeted dependency is already added to sorted array.
