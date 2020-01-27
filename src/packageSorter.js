@@ -24,7 +24,7 @@ function extractCoreDep(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-function packageSorter(packages, coreDep = extractCoreDep(packages)) {
+function packageSorter(packages = [], coreDep = extractCoreDep(packages)) {
   const sorted = [];
 
   if (!coreDep) return [];
