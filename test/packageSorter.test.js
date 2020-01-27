@@ -36,16 +36,23 @@ const pkg4 = {
 describe("sortPackages test", () => {
   it("sorts all packages with given core dependency", () => {
     const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
-    const sorted = sortPackages(packages, "@folo");
+    const result = sortPackages(packages, "@folo");
 
-    expect(sorted).to.have.members([pkg2, pkg0, pkg1, pkg4, pkg3]);
+    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+
+    expect(result).to.deep.equal(expectedResult);
   });
 
   it("it extracts core dependency if not passed by default then sort", () => {
+    /**
+     * Same as above but without passing core dep.
+     */
     const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
-    const sorted = sortPackages(packages);
+    const result = sortPackages(packages);
 
-    expect(sorted).to.have.members([pkg2, pkg0, pkg1, pkg4, pkg3]);
+    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+
+    expect(result).to.deep.equal(expectedResult);
   });
 
   it("returns empty array when it all don't have the core-dependency", () => {
@@ -72,7 +79,7 @@ describe("sortPackages test", () => {
     const packages = [pkg10, pkg11, pkg12];
     const sorted = sortPackages(packages, "@folo");
 
-    expect(sorted).to.have.members([]);
+    expect(sorted).to.deep.equal([]);
   });
 
   it("returns only packages that able to sort them, ignore the other", () => {
@@ -97,6 +104,6 @@ describe("sortPackages test", () => {
     const packages = [pkg20, pkg21, pkg22];
     const sorted = sortPackages(packages, "@folo");
 
-    expect(sorted).to.have.members([pkg22, pkg21]);
+    expect(sorted).to.deep.equal([pkg22, pkg21]);
   });
 });
