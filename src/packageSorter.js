@@ -25,9 +25,15 @@ function extractCoreDep(packages) {
  * @returns {Array} - Sorted Array.
  */
 function packageSorter(packages = [], coreDep = extractCoreDep(packages)) {
-  const sorted = [];
+  /**
+   * Nothing to sort when:
+   *  1- have only one package.
+   *  2- can't discover the coreDep (which may be due to packages not depending
+   * on each other aka already sorted)
+   */
+  if (packages.length === 1 || !coreDep) return packages;
 
-  if (!coreDep) return [];
+  const sorted = [];
 
   /**
    * Checks if targeted dependency is already added to sorted array.

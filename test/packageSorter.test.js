@@ -107,8 +107,7 @@ describe("sortPackages test", () => {
     expect(sorted).to.deep.equal([pkg22, pkg21]);
   });
 
-  // discover a bug.
-  it("bug here:", () => {
+  it("returns pkg if there is nothing to sort", () => {
     const pkg = {
       name: "builderz",
 
