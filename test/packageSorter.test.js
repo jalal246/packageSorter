@@ -106,4 +106,18 @@ describe("sortPackages test", () => {
 
     expect(sorted).to.deep.equal([pkg22, pkg21]);
   });
+
+  it("returns pkg if there is nothing to sort", () => {
+    const pkg = {
+      name: "builderz",
+
+      dependencies: {
+        "@rollup/plugin-auto-install": "^2.0.0",
+        "@rollup/plugin-beep": "^0.1.2",
+        "@rollup/plugin-commonjs": "^11.0.1"
+      }
+    };
+
+    expect([pkg]).to.deep.equal(sortPackages([pkg]));
+  });
 });
