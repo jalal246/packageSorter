@@ -1,6 +1,6 @@
 {
   "name": "package-sorter",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "src/index.js",
   "repository": "https://github.com/jalal246/packageSorter.git",
   "author": "Jalal Maskoun <jimmy002020@gmail.com>",
