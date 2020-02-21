@@ -8,7 +8,9 @@
   "scripts": {
     "test": "mocha -require @babel/register"
   },
-  "dependencies": {},
+  "dependencies": {
+    "corename": "^1.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
