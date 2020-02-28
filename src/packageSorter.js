@@ -1,6 +1,6 @@
 const getCoreName = require("corename");
 
-let sorted;
+const sorted = [];
 let coreDep;
 
 /**
@@ -9,7 +9,7 @@ let coreDep;
  * @param {string} dep - name of targeted dependency.
  * @returns {boolean}
  */
-function isInFiltered(dep) {
+function isAddedToSorted(dep) {
   /**
    * Check if dependency already added, using name package matching.
    */
@@ -38,7 +38,7 @@ function isAddPackage(packageDeps) {
     const dep = packageDepsArr[i];
 
     if (dep.includes(coreDep)) {
-      isAdd = isInFiltered(dep);
+      isAdd = isAddedToSorted(dep);
 
       if (isAdd) break;
     }
@@ -83,16 +83,18 @@ function sort(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-function packageSorter(packages = [], coreDep = getCoreName(packages)) {
+function packageSorter(packages = [], coreDependency) {
   /**
    * Nothing to sort when:
    *  1- have only one package.
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length === 1 || !coreDep) return packages;
+  if (packages.length === 1) return packages;
 
-  const sorted = [];
+  coreDep = coreDependency || getCoreName(packages);
+
+  if (!coreDep) return packages;
 
   while (packages.length > 0) {
     const noChange = sort(packages);
