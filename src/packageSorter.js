@@ -1,6 +1,6 @@
 const getCoreName = require("corename");
 
-const sorted = [];
+let sorted;
 let coreDep;
 
 /**
@@ -90,12 +90,13 @@ function packageSorter(packages = [], coreDependency) {
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length === 1) return packages;
+  if (packages.length <= 1) return packages;
 
   coreDep = coreDependency || getCoreName(packages);
 
   if (!coreDep) return packages;
 
+  sorted = [];
   while (packages.length > 0) {
     const noChange = sort(packages);
     if (!noChange) break;
