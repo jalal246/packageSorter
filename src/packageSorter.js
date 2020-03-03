@@ -1,7 +1,9 @@
 const getCoreName = require("corename");
+const { move, moveMultiple } = require("move-position");
 
 let sorted;
 let coreDep;
+let numOfPackages;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -51,7 +53,9 @@ function isAddPackage(packageDeps) {
  * Loop into packages. Add package that don't require coreDep first, then add
  * coreDep, then other packages.
  */
-function sort(packages) {
+function sort(packages, associatedArr = []) {
+  const isAssociatedArr = associatedArr.length > 0;
+
   let noChange = false;
   packages.forEach(({ dependencies = {} }, i) => {
     /**
@@ -61,14 +65,18 @@ function sort(packages) {
     const isAdd = isAddPackage(dependencies, coreDep);
 
     if (isAdd) {
-      sorted.push(packages[i]);
+      const to = sorted.push(packages[i]);
 
       /**
        *  remove it from unsorted
        */
       packages.splice(i, 1);
 
+      numOfPackages -= 1;
+
       noChange = true;
+
+      if (isAssociatedArr) moveMultiple(associatedArr, i, to);
     }
   });
 
@@ -83,7 +91,7 @@ function sort(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-function packageSorter(packages = [], coreDependency) {
+function packageSorter(packages = [], coreDependency, associatedArr) {
   /**
    * Nothing to sort when:
    *  1- have only one package.
@@ -96,9 +104,11 @@ function packageSorter(packages = [], coreDependency) {
 
   if (!coreDep) return packages;
 
+  numOfPackages = packages.length;
+
   sorted = [];
-  while (packages.length > 0) {
-    const noChange = sort(packages);
+  while (numOfPackages > 0) {
+    const noChange = sort(packages, associatedArr);
     if (!noChange) break;
   }
 
