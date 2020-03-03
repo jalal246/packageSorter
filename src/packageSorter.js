@@ -54,7 +54,7 @@ function isAddPackage(packageDeps) {
  * coreDep, then other packages.
  */
 function sort(packages) {
-  let noChange = false;
+  let isSorted = false;
 
   let to = 0;
   let from = 0;
@@ -67,7 +67,7 @@ function sort(packages) {
     const isAdd = isAddPackage(dependencies, coreDep);
 
     if (isAdd) {
-      to = sorted.push(packages[i]);
+      to = sorted.push(packages[i]) - 1;
       from = i;
 
       /**
@@ -75,14 +75,12 @@ function sort(packages) {
        */
       packages.splice(i, 1);
 
-      numOfPackages -= 1;
-
-      noChange = true;
+      isSorted = true;
     }
   });
 
   return {
-    noChange,
+    isSorted,
     from,
     to
   };
@@ -111,16 +109,19 @@ function packageSorter(packages = [], coreDependency, associatedArr) {
 
   const isAssociatedArr = associatedArr && associatedArr.length > 0;
 
-  numOfPackages = packages.length;
+  const totalLength = packages.length;
 
   sorted = [];
-  while (numOfPackages > 0) {
-    const { noChange, from, to } = sort(packages);
 
-    if (!noChange) break;
+  while (sorted.length !== totalLength) {
+    const { isSorted, from, to } = sort(packages);
 
-    // if change?
     if (isAssociatedArr) moveMultiple(associatedArr, from, to);
+
+    if (!isSorted) {
+      const currentIndex = sorted.length;
+      sorted.push(packages[currentIndex]);
+    }
   }
 
   return sorted;
