@@ -3,7 +3,6 @@ const { moveMultiple } = require("move-position");
 
 let sorted;
 let coreDep;
-let numOfPackages;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -116,12 +115,12 @@ function packageSorter(packages = [], coreDependency, associatedArr) {
   while (sorted.length !== totalLength) {
     const { isSorted, from, to } = sort(packages);
 
-    if (isAssociatedArr) moveMultiple(associatedArr, from, to);
-
     if (!isSorted) {
       const currentIndex = sorted.length;
       sorted.push(packages[currentIndex]);
     }
+
+    if (isAssociatedArr) moveMultiple(associatedArr, from, to);
   }
 
   return sorted;
