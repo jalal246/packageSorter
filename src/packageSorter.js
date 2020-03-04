@@ -20,18 +20,14 @@ function isDepInSorted(dep) {
 }
 
 /**
- * Checks if given package should be added to sorted array.
- *
- * If package dependencies doesn't matched coreDep, then returns true. It
- * should be added because it's neutral.
- *
- * Otherwise, checks, if it exists before, then true to add it, if not false.
- * Because we should add the essential dependency first.
+ * Checks if given package has decency in coreDep.
  *
  * @param {Object} packageDeps
- * @returns {boolean}
+ *
+ * @returns {Object} result
+ * @returns {boolean} result.hasCoreDep
+ * @returns {Object} result.dep
  */
-
 function isPackageNeedCoreDep(packageDeps) {
   let hasCoreDep = false;
   let dep;
@@ -49,6 +45,13 @@ function isPackageNeedCoreDep(packageDeps) {
   return { hasCoreDep, dep };
 }
 
+/**
+ * Adds package at(index) to sorted or inSorted.
+ *
+ * @param {Array} packages - packages in workspace.
+ * @param {number} at - index
+ * @param {boolean} isSorted -
+ */
 function addTo(packages, at, isSorted) {
   const target = isSorted ? sorted : unSorted;
 
@@ -65,6 +68,8 @@ function addTo(packages, at, isSorted) {
 /**
  * Loop into packages. Add package that don't require coreDep first, then add
  * coreDep, then other packages.
+ *
+ * @param {Array} packages - packages in workspace.
  */
 function sort(packages) {
   let isAddToSorted = false;
@@ -86,11 +91,6 @@ function sort(packages) {
      */
     isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
-    // console.log("sort -> pkg", pkg.name);
-    // console.log("sort -> hasCoreDep", hasCoreDep);
-    // console.log("sort -> isDepInSorted", isDepInSorted(dep));
-    // console.log("sort -> isAddToSorted", isAddToSorted);
-
     if (isAddToSorted) {
       addTo(packages, i, true);
 
@@ -100,7 +100,6 @@ function sort(packages) {
 
   /**
    * Has hasCoreDep but couldn't add it.
-   * - Stop looping.
    * - Add it to unsorted.
    * - remove it form packages.
    */
@@ -113,10 +112,13 @@ function sort(packages) {
  * Sorting packages. Package with no deps will come first, then package that
  * depending of package that is built. This is essential for monorepo build.
  *
- * @param {Array} packages - contains dependencies for each package in workspace.
+ * @param {Array} packages - packages in workspace.
  * @param {string} coreDependency - core package that other packages depend on.
- * @returns {Array} - Sorted Array.
- */
+ *
+ * @returns {Object} result
+ * @returns {boolean} result.sorted
+ * @returns {Object} result.unSorted
+ * */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
 
