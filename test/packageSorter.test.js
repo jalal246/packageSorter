@@ -1,31 +1,31 @@
 import { expect } from "chai";
 import sortPackages from "../src";
 
-const pkg0 = {
+const pkgFoloContext = {
   name: "@folo/withcontext",
   dependencies: {}
 };
 
-const pkg1 = {
+const pkgFoloValues = {
   name: "@folo/values",
   dependencies: {
     "@folo/withcontext": "^0.1.5"
   }
 };
 
-const pkg2 = {
+const pkgFoloUtils = {
   name: "@folo/utils",
   dependencies: {}
 };
 
-const pkg3 = {
+const pkgFoloLayout = {
   name: "@folo/layout",
   dependencies: {
     "@folo/withcontext": "^0.1.5"
   }
 };
 
-const pkg4 = {
+const pkgFoloForms = {
   name: "@folo/forms",
   dependencies: {
     "@folo/layout": "^0.1.4",
@@ -34,26 +34,115 @@ const pkg4 = {
 };
 
 describe("sortPackages test", () => {
-  it("sorts all packages with given core dependency", () => {
-    const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
+  it.only("sorts all packages with given core dependency", () => {
+    const packages = [
+      pkgFoloValues,
+      pkgFoloUtils,
+      pkgFoloLayout,
+      pkgFoloContext,
+      pkgFoloForms
+    ];
     const result = sortPackages(packages, "@folo");
 
-    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgFoloLayout,
+      pkgFoloForms
+    ];
 
-    expect(result).to.deep.equal(expectedResult);
+    expect(result).to.have.ordered.members(expectedResult);
   });
 
-  it("it extracts core dependency if not passed by default then sort", () => {
+  it.only("it extracts core dependency if not passed by default then sorts", () => {
     /**
      * Same as above but without passing core dep.
      */
-    const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
+    const packages = [
+      pkgFoloValues,
+      pkgFoloUtils,
+      pkgFoloLayout,
+      pkgFoloContext,
+      pkgFoloForms
+    ];
+    const result = sortPackages(packages, "@folo");
+
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgFoloLayout,
+      pkgFoloForms
+    ];
+
+    expect(result).to.have.ordered.members(expectedResult);
+  });
+
+  it.only("sorts all mixed-package some sortable, others not", () => {
+    const pkgUN1 = {
+      name: "unsortable1",
+      dependencies: {
+        layout1: "^0.1.4",
+        values1: "^0.1.4"
+      }
+    };
+
+    const pkgUN2 = {
+      name: "unsortable2",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const pkgUN3 = {
+      name: "unsortable3",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const packages = [
+      pkgFoloUtils,
+      pkgUN1,
+      pkgFoloValues,
+      pkgUN2,
+      pkgFoloContext,
+      pkgUN3
+    ];
+
     const result = sortPackages(packages);
 
-    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgUN1,
+      pkgUN2,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgUN3
+    ];
 
-    expect(result).to.deep.equal(expectedResult);
+    expect(result).to.have.ordered.members(expectedResult);
   });
+
+  // it("it sorts packages and associated arrays", () => {
+  //   /**
+  //    * Same as above but without passing core dep.
+  //    */
+  //   const packages = [pkgFoloValues, pkgFoloContext, pkgFoloForms];
+
+  //   const distPath = ["1", "0", "4"];
+  //   const result = sortPackages(packages, null, [distPath]);
+  //   // console.log("result", result);
+
+  //   const expectedResult = [pkgFoloContext, pkgFoloValues, pkgFoloForms];
+  //   // console.log("distPath", distPath);
+
+  //   expect(result).to.have.ordered.members(expectedResult);
+  //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
+  // });
 
   it("returns empty array when it all don't have the core-dependency", () => {
     const pkg10 = {
@@ -76,10 +165,12 @@ describe("sortPackages test", () => {
         "@folo/pop": "^0.1.5"
       }
     };
+
     const packages = [pkg10, pkg11, pkg12];
     const sorted = sortPackages(packages, "@folo");
+    console.log("sorted", sorted);
 
-    expect(sorted).to.deep.equal([]);
+    expect(sorted).to.have.ordered.members(packages);
   });
 
   it("returns only packages that able to sort them, ignore the other", () => {
