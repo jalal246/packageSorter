@@ -1,5 +1,4 @@
 const getCoreName = require("corename");
-const { moveMultiple } = require("move-position");
 
 let sorted;
 let unSorted;
@@ -32,26 +31,6 @@ function isDepInSorted(dep) {
  * @param {Object} packageDeps
  * @returns {boolean}
  */
-function hasToAddPackage(packageDeps) {
-  let isAdd = true;
-
-  const packageDepsArr = Object.keys(packageDeps);
-
-  for (let i = 0; i < packageDepsArr.length; i += 1) {
-    const dep = packageDepsArr[i];
-
-    const hasCoreDependency = dep.includes(coreDep);
-    console.log("hasToAddPackage -> hasCoreDependency", hasCoreDependency);
-
-    if (dep.includes(coreDep)) {
-      isAdd = isDepInSorted(dep);
-
-      if (isAdd) break;
-    }
-  }
-
-  return isAdd;
-}
 
 function isPackageNeedCoreDep(packageDeps) {
   let hasCoreDep = false;
@@ -89,9 +68,6 @@ function addTo(packages, at, isSorted) {
  */
 function sort(packages) {
   let isAddToSorted = false;
-
-  const to = 0;
-  const from = 0;
 
   let hasCoreDep = false;
   let dep = {};
@@ -131,12 +107,6 @@ function sort(packages) {
   if (!isAddToSorted && hasCoreDep) {
     addTo(packages, 0, false);
   }
-
-  return {
-    isSorted: isAddToSorted,
-    from,
-    to
-  };
 }
 
 /**
@@ -148,48 +118,32 @@ function sort(packages) {
  * @returns {Array} - Sorted Array.
  */
 function packageSorter(packages = [], coreDependency) {
+  unSorted = [];
+
   /**
    * Nothing to sort when:
    *  1- have only one package.
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length <= 1) return packages;
+  if (packages.length <= 1) return { sorted: packages, unSorted };
 
   coreDep = coreDependency || getCoreName(packages);
 
-  if (!coreDep) return packages;
+  if (!coreDep) return { sorted: packages, unSorted };
 
   const totalLength = packages.length;
-
   sorted = [];
-  unSorted = [];
-  let i = 0;
+
   elemAdded = 0;
 
   while (sorted.length < totalLength) {
-    // console.log(sorted.length, totalLength);
-    const { isSorted, from, to } = sort(packages);
-
-    i++;
-
-    // console.log("in", isSorted, i);
-    if (i === 1000) {
-      /**
-       * Two cases:
-       * 1 - Unsorted because it doesn't have decency on other packages.
-       * 2 - Unsorted because there's missing decency on packages.
-       */
-
-      break;
-    }
+    sort(packages);
 
     if (elemAdded === totalLength) {
       break;
     }
   }
-
-  // console.log("packageSorter -> unSorted", unSorted);
 
   return { sorted, unSorted };
 }
