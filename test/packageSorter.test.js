@@ -42,7 +42,7 @@ describe("sortPackages test", () => {
       pkgFoloContext,
       pkgFoloForms
     ];
-    const result = sortPackages(packages, "@folo");
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
     const expectedResult = [
       pkgFoloUtils,
@@ -52,7 +52,8 @@ describe("sortPackages test", () => {
       pkgFoloForms
     ];
 
-    expect(result).to.have.ordered.members(expectedResult);
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
   });
 
   it.only("it extracts core dependency if not passed by default then sorts", () => {
@@ -66,7 +67,7 @@ describe("sortPackages test", () => {
       pkgFoloContext,
       pkgFoloForms
     ];
-    const result = sortPackages(packages, "@folo");
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
     const expectedResult = [
       pkgFoloUtils,
@@ -76,7 +77,8 @@ describe("sortPackages test", () => {
       pkgFoloForms
     ];
 
-    expect(result).to.have.ordered.members(expectedResult);
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
   });
 
   it.only("sorts all mixed-package some sortable, others not", () => {
@@ -113,7 +115,7 @@ describe("sortPackages test", () => {
       pkgUN3
     ];
 
-    const result = sortPackages(packages);
+    const { sorted, unSorted } = sortPackages(packages);
 
     const expectedResult = [
       pkgFoloUtils,
@@ -124,7 +126,8 @@ describe("sortPackages test", () => {
       pkgUN3
     ];
 
-    expect(result).to.have.ordered.members(expectedResult);
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
   });
 
   // it("it sorts packages and associated arrays", () => {
@@ -144,7 +147,7 @@ describe("sortPackages test", () => {
   //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
   // });
 
-  it("returns empty array when it all don't have the core-dependency", () => {
+  it.only("returns empty array when it all don't have the core-dependency", () => {
     const pkg10 = {
       name: "@folo/withcontext",
       dependencies: {
@@ -167,48 +170,48 @@ describe("sortPackages test", () => {
     };
 
     const packages = [pkg10, pkg11, pkg12];
-    const sorted = sortPackages(packages, "@folo");
-    console.log("sorted", sorted);
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
-    expect(sorted).to.have.ordered.members(packages);
+    expect(sorted.length).to.be.equal(0);
+    expect(unSorted).to.have.ordered.members([pkg10, pkg11, pkg12]);
   });
 
-  it("returns only packages that able to sort them, ignore the other", () => {
-    const pkg20 = {
-      name: "@folo/withcontext",
-      dependencies: {
-        "@folo/eslint": "^0.1.5"
-      }
-    };
+  // it("returns only packages that able to sort them, ignore the other", () => {
+  //   const pkg20 = {
+  //     name: "@folo/withcontext",
+  //     dependencies: {
+  //       "@folo/eslint": "^0.1.5"
+  //     }
+  //   };
 
-    const pkg21 = {
-      name: "@folo/values",
-      dependencies: {
-        "@folo/tools": "^0.1.5"
-      }
-    };
+  //   const pkg21 = {
+  //     name: "@folo/values",
+  //     dependencies: {
+  //       "@folo/tools": "^0.1.5"
+  //     }
+  //   };
 
-    const pkg22 = {
-      name: "@folo/tools",
-      dependencies: {}
-    };
-    const packages = [pkg20, pkg21, pkg22];
-    const sorted = sortPackages(packages, "@folo");
+  //   const pkg22 = {
+  //     name: "@folo/tools",
+  //     dependencies: {}
+  //   };
+  //   const packages = [pkg20, pkg21, pkg22];
+  //   const sorted = sortPackages(packages, "@folo");
 
-    expect(sorted).to.deep.equal([pkg22, pkg21]);
-  });
+  //   expect(sorted).to.deep.equal([pkg22, pkg21]);
+  // });
 
-  it("returns pkg if there is nothing to sort", () => {
-    const pkg = {
-      name: "builderz",
+  // it("returns pkg if there is nothing to sort", () => {
+  //   const pkg = {
+  //     name: "builderz",
 
-      dependencies: {
-        "@rollup/plugin-auto-install": "^2.0.0",
-        "@rollup/plugin-beep": "^0.1.2",
-        "@rollup/plugin-commonjs": "^11.0.1"
-      }
-    };
+  //     dependencies: {
+  //       "@rollup/plugin-auto-install": "^2.0.0",
+  //       "@rollup/plugin-beep": "^0.1.2",
+  //       "@rollup/plugin-commonjs": "^11.0.1"
+  //     }
+  //   };
 
-    expect([pkg]).to.deep.equal(sortPackages([pkg]));
-  });
+  //   expect([pkg]).to.deep.equal(sortPackages([pkg]));
+  // });
 });

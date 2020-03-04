@@ -2,7 +2,9 @@ const getCoreName = require("corename");
 const { moveMultiple } = require("move-position");
 
 let sorted;
+let unSorted;
 let coreDep;
+let elemAdded;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -10,7 +12,7 @@ let coreDep;
  * @param {string} dep - name of targeted dependency.
  * @returns {boolean}
  */
-function isAddedToSorted(dep) {
+function isDepInSorted(dep) {
   /**
    * Check if dependency already added, using name package matching.
    */
@@ -30,7 +32,7 @@ function isAddedToSorted(dep) {
  * @param {Object} packageDeps
  * @returns {boolean}
  */
-function isAddPackage(packageDeps) {
+function hasToAddPackage(packageDeps) {
   let isAdd = true;
 
   const packageDepsArr = Object.keys(packageDeps);
@@ -38,8 +40,11 @@ function isAddPackage(packageDeps) {
   for (let i = 0; i < packageDepsArr.length; i += 1) {
     const dep = packageDepsArr[i];
 
+    const hasCoreDependency = dep.includes(coreDep);
+    console.log("hasToAddPackage -> hasCoreDependency", hasCoreDependency);
+
     if (dep.includes(coreDep)) {
-      isAdd = isAddedToSorted(dep);
+      isAdd = isDepInSorted(dep);
 
       if (isAdd) break;
     }
@@ -48,38 +53,87 @@ function isAddPackage(packageDeps) {
   return isAdd;
 }
 
+function isPackageNeedCoreDep(packageDeps) {
+  let hasCoreDep = false;
+  let dep;
+
+  const packageDepsArr = Object.keys(packageDeps);
+
+  for (let i = 0; i < packageDepsArr.length; i += 1) {
+    dep = packageDepsArr[i];
+
+    hasCoreDep = dep.includes(coreDep);
+
+    if (hasCoreDep) break;
+  }
+
+  return { hasCoreDep, dep };
+}
+
+function addTo(packages, at, isSorted) {
+  const target = isSorted ? sorted : unSorted;
+
+  target.push(packages[at]);
+
+  /**
+   *  remove it from packages so it won't be checked next time.
+   */
+  packages.splice(at, 1);
+
+  elemAdded += 1;
+}
+
 /**
  * Loop into packages. Add package that don't require coreDep first, then add
  * coreDep, then other packages.
  */
 function sort(packages) {
-  let isSorted = false;
+  let isAddToSorted = false;
 
-  let to = 0;
-  let from = 0;
+  const to = 0;
+  const from = 0;
 
-  packages.forEach(({ dependencies = {} }, i) => {
+  let hasCoreDep = false;
+  let dep = {};
+
+  for (let i = 0; i < packages.length; i += 1) {
+    const pkg = packages[i];
+
+    const { dependencies } = pkg;
+
+    ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
+
     /**
-     * Checks if this package is already existed in sorted array or even has
-     * coreDep
+     * When to add package to sorted?
+     * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
+     * - Not natural, but its core dep is already added.
      */
-    const isAdd = isAddPackage(dependencies, coreDep);
+    isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
-    if (isAdd) {
-      to = sorted.push(packages[i]) - 1;
-      from = i;
+    // console.log("sort -> pkg", pkg.name);
+    // console.log("sort -> hasCoreDep", hasCoreDep);
+    // console.log("sort -> isDepInSorted", isDepInSorted(dep));
+    // console.log("sort -> isAddToSorted", isAddToSorted);
 
-      /**
-       *  remove it from unsorted
-       */
-      packages.splice(i, 1);
+    if (isAddToSorted) {
+      addTo(packages, i, true);
 
-      isSorted = true;
+      break;
     }
-  });
+  }
+
+  /**
+   * Has hasCoreDep but couldn't add it.
+   * - Stop looping.
+   * - Add it to unsorted.
+   * - remove it form packages.
+   */
+  if (!isAddToSorted && hasCoreDep) {
+    addTo(packages, 0, false);
+  }
 
   return {
-    isSorted,
+    isSorted: isAddToSorted,
     from,
     to
   };
@@ -93,7 +147,7 @@ function sort(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  * @returns {Array} - Sorted Array.
  */
-function packageSorter(packages = [], coreDependency, associatedArr) {
+function packageSorter(packages = [], coreDependency) {
   /**
    * Nothing to sort when:
    *  1- have only one package.
@@ -106,24 +160,38 @@ function packageSorter(packages = [], coreDependency, associatedArr) {
 
   if (!coreDep) return packages;
 
-  const isAssociatedArr = associatedArr && associatedArr.length > 0;
-
   const totalLength = packages.length;
 
   sorted = [];
+  unSorted = [];
+  let i = 0;
+  elemAdded = 0;
 
-  while (sorted.length !== totalLength) {
+  while (sorted.length < totalLength) {
+    // console.log(sorted.length, totalLength);
     const { isSorted, from, to } = sort(packages);
 
-    if (!isSorted) {
-      const currentIndex = sorted.length;
-      sorted.push(packages[currentIndex]);
+    i++;
+
+    // console.log("in", isSorted, i);
+    if (i === 1000) {
+      /**
+       * Two cases:
+       * 1 - Unsorted because it doesn't have decency on other packages.
+       * 2 - Unsorted because there's missing decency on packages.
+       */
+
+      break;
     }
 
-    if (isAssociatedArr) moveMultiple(associatedArr, from, to);
+    if (elemAdded === totalLength) {
+      break;
+    }
   }
 
-  return sorted;
+  // console.log("packageSorter -> unSorted", unSorted);
+
+  return { sorted, unSorted };
 }
 
 module.exports = packageSorter;
