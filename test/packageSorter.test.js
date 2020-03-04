@@ -81,7 +81,7 @@ describe("sortPackages test", () => {
     expect(unSorted.length).to.be.equal(0);
   });
 
-  it.only("sorts all mixed-package some sortable, others not", () => {
+  it.only("sorts all mixed-package some sortable, others don't have related core dep", () => {
     const pkgUN1 = {
       name: "unsortable1",
       dependencies: {
@@ -147,7 +147,7 @@ describe("sortPackages test", () => {
   //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
   // });
 
-  it.only("returns empty array when it all don't have the core-dependency", () => {
+  it.only("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
       name: "@folo/withcontext",
       dependencies: {
