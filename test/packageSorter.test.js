@@ -34,7 +34,7 @@ const pkgFoloForms = {
 };
 
 describe("sortPackages test", () => {
-  it.only("sorts all packages with given core dependency", () => {
+  it("sorts all packages with given core dependency", () => {
     const packages = [
       pkgFoloValues,
       pkgFoloUtils,
@@ -56,7 +56,7 @@ describe("sortPackages test", () => {
     expect(unSorted.length).to.be.equal(0);
   });
 
-  it.only("it extracts core dependency if not passed by default then sorts", () => {
+  it("it extracts core dependency if not passed by default then sorts", () => {
     /**
      * Same as above but without passing core dep.
      */
@@ -81,7 +81,7 @@ describe("sortPackages test", () => {
     expect(unSorted.length).to.be.equal(0);
   });
 
-  it.only("sorts all mixed-package some sortable, others don't have related core dep", () => {
+  it("sorts all mixed-package some sortable, others don't have related core dep", () => {
     const pkgUN1 = {
       name: "unsortable1",
       dependencies: {
@@ -147,7 +147,7 @@ describe("sortPackages test", () => {
   //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
   // });
 
-  it.only("returns all unsorted packages that have core dep", () => {
+  it("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
       name: "@folo/withcontext",
       dependencies: {
@@ -176,42 +176,62 @@ describe("sortPackages test", () => {
     expect(unSorted).to.have.ordered.members([pkg10, pkg11, pkg12]);
   });
 
-  // it("returns only packages that able to sort them, ignore the other", () => {
-  //   const pkg20 = {
-  //     name: "@folo/withcontext",
-  //     dependencies: {
-  //       "@folo/eslint": "^0.1.5"
-  //     }
-  //   };
+  it("returns only packages that able to sort them, ignore the other", () => {
+    const pkg20 = {
+      name: "@folo/withcontext",
+      dependencies: {
+        "@folo/eslint": "^0.1.5"
+      }
+    };
 
-  //   const pkg21 = {
-  //     name: "@folo/values",
-  //     dependencies: {
-  //       "@folo/tools": "^0.1.5"
-  //     }
-  //   };
+    const pkg21 = {
+      name: "@folo/values",
+      dependencies: {
+        "@folo/tools": "^0.1.5"
+      }
+    };
 
-  //   const pkg22 = {
-  //     name: "@folo/tools",
-  //     dependencies: {}
-  //   };
-  //   const packages = [pkg20, pkg21, pkg22];
-  //   const sorted = sortPackages(packages, "@folo");
+    const pkg22 = {
+      name: "@folo/tools",
+      dependencies: {}
+    };
 
-  //   expect(sorted).to.deep.equal([pkg22, pkg21]);
-  // });
+    const packages = [pkg20, pkg21, pkg22];
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
-  // it("returns pkg if there is nothing to sort", () => {
-  //   const pkg = {
-  //     name: "builderz",
+    expect(sorted).to.have.ordered.members([pkg22, pkg21]);
+    expect(unSorted).to.have.ordered.members([pkg20]);
+  });
 
-  //     dependencies: {
-  //       "@rollup/plugin-auto-install": "^2.0.0",
-  //       "@rollup/plugin-beep": "^0.1.2",
-  //       "@rollup/plugin-commonjs": "^11.0.1"
-  //     }
-  //   };
+  it("returns same input as sorted if there is nothing to sort", () => {
+    const pkgUN1 = {
+      name: "unsortable1",
+      dependencies: {
+        layout1: "^0.1.4",
+        values1: "^0.1.4"
+      }
+    };
 
-  //   expect([pkg]).to.deep.equal(sortPackages([pkg]));
-  // });
+    const pkgUN2 = {
+      name: "unsortable2",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const pkgUN3 = {
+      name: "unsortable3",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+    const packages = [pkgUN1, pkgUN2, pkgUN3];
+
+    const { sorted, unSorted } = sortPackages(packages);
+
+    expect(sorted).to.have.ordered.members(packages);
+    expect(unSorted.length).to.be.equal(0);
+  });
 });
