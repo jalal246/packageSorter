@@ -1,31 +1,31 @@
 import { expect } from "chai";
 import sortPackages from "../src";
 
-const pkg0 = {
+const pkgFoloContext = {
   name: "@folo/withcontext",
   dependencies: {}
 };
 
-const pkg1 = {
+const pkgFoloValues = {
   name: "@folo/values",
   dependencies: {
     "@folo/withcontext": "^0.1.5"
   }
 };
 
-const pkg2 = {
+const pkgFoloUtils = {
   name: "@folo/utils",
   dependencies: {}
 };
 
-const pkg3 = {
+const pkgFoloLayout = {
   name: "@folo/layout",
   dependencies: {
     "@folo/withcontext": "^0.1.5"
   }
 };
 
-const pkg4 = {
+const pkgFoloForms = {
   name: "@folo/forms",
   dependencies: {
     "@folo/layout": "^0.1.4",
@@ -35,27 +35,119 @@ const pkg4 = {
 
 describe("sortPackages test", () => {
   it("sorts all packages with given core dependency", () => {
-    const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
-    const result = sortPackages(packages, "@folo");
+    const packages = [
+      pkgFoloValues,
+      pkgFoloUtils,
+      pkgFoloLayout,
+      pkgFoloContext,
+      pkgFoloForms
+    ];
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
-    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgFoloLayout,
+      pkgFoloForms
+    ];
 
-    expect(result).to.deep.equal(expectedResult);
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
   });
 
-  it("it extracts core dependency if not passed by default then sort", () => {
+  it("it extracts core dependency if not passed by default then sorts", () => {
     /**
      * Same as above but without passing core dep.
      */
-    const packages = [pkg1, pkg2, pkg3, pkg0, pkg4];
-    const result = sortPackages(packages);
+    const packages = [
+      pkgFoloValues,
+      pkgFoloUtils,
+      pkgFoloLayout,
+      pkgFoloContext,
+      pkgFoloForms
+    ];
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
 
-    const expectedResult = [pkg2, pkg0, pkg1, pkg4, pkg3];
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgFoloLayout,
+      pkgFoloForms
+    ];
 
-    expect(result).to.deep.equal(expectedResult);
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
   });
 
-  it("returns empty array when it all don't have the core-dependency", () => {
+  it("sorts all mixed-package some sortable, others don't have related core dep", () => {
+    const pkgUN1 = {
+      name: "unsortable1",
+      dependencies: {
+        layout1: "^0.1.4",
+        values1: "^0.1.4"
+      }
+    };
+
+    const pkgUN2 = {
+      name: "unsortable2",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const pkgUN3 = {
+      name: "unsortable3",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const packages = [
+      pkgFoloUtils,
+      pkgUN1,
+      pkgFoloValues,
+      pkgUN2,
+      pkgFoloContext,
+      pkgUN3
+    ];
+
+    const { sorted, unSorted } = sortPackages(packages);
+
+    const expectedResult = [
+      pkgFoloUtils,
+      pkgUN1,
+      pkgUN2,
+      pkgFoloContext,
+      pkgFoloValues,
+      pkgUN3
+    ];
+
+    expect(sorted).to.have.ordered.members(expectedResult);
+    expect(unSorted.length).to.be.equal(0);
+  });
+
+  // it("it sorts packages and associated arrays", () => {
+  //   /**
+  //    * Same as above but without passing core dep.
+  //    */
+  //   const packages = [pkgFoloValues, pkgFoloContext, pkgFoloForms];
+
+  //   const distPath = ["1", "0", "4"];
+  //   const result = sortPackages(packages, null, [distPath]);
+  //   // console.log("result", result);
+
+  //   const expectedResult = [pkgFoloContext, pkgFoloValues, pkgFoloForms];
+  //   // console.log("distPath", distPath);
+
+  //   expect(result).to.have.ordered.members(expectedResult);
+  //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
+  // });
+
+  it("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
       name: "@folo/withcontext",
       dependencies: {
@@ -76,10 +168,12 @@ describe("sortPackages test", () => {
         "@folo/pop": "^0.1.5"
       }
     };
-    const packages = [pkg10, pkg11, pkg12];
-    const sorted = sortPackages(packages, "@folo");
 
-    expect(sorted).to.deep.equal([]);
+    const packages = [pkg10, pkg11, pkg12];
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
+
+    expect(sorted.length).to.be.equal(0);
+    expect(unSorted).to.have.ordered.members([pkg10, pkg11, pkg12]);
   });
 
   it("returns only packages that able to sort them, ignore the other", () => {
@@ -101,23 +195,43 @@ describe("sortPackages test", () => {
       name: "@folo/tools",
       dependencies: {}
     };
-    const packages = [pkg20, pkg21, pkg22];
-    const sorted = sortPackages(packages, "@folo");
 
-    expect(sorted).to.deep.equal([pkg22, pkg21]);
+    const packages = [pkg20, pkg21, pkg22];
+    const { sorted, unSorted } = sortPackages(packages, "@folo");
+
+    expect(sorted).to.have.ordered.members([pkg22, pkg21]);
+    expect(unSorted).to.have.ordered.members([pkg20]);
   });
 
-  it("returns pkg if there is nothing to sort", () => {
-    const pkg = {
-      name: "builderz",
-
+  it("returns same input as sorted if there is nothing to sort", () => {
+    const pkgUN1 = {
+      name: "unsortable1",
       dependencies: {
-        "@rollup/plugin-auto-install": "^2.0.0",
-        "@rollup/plugin-beep": "^0.1.2",
-        "@rollup/plugin-commonjs": "^11.0.1"
+        layout1: "^0.1.4",
+        values1: "^0.1.4"
       }
     };
 
-    expect([pkg]).to.deep.equal(sortPackages([pkg]));
+    const pkgUN2 = {
+      name: "unsortable2",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+
+    const pkgUN3 = {
+      name: "unsortable3",
+      dependencies: {
+        layout2: "^0.1.4",
+        values2: "^0.1.4"
+      }
+    };
+    const packages = [pkgUN1, pkgUN2, pkgUN3];
+
+    const { sorted, unSorted } = sortPackages(packages);
+
+    expect(sorted).to.have.ordered.members(packages);
+    expect(unSorted.length).to.be.equal(0);
   });
 });

@@ -1,7 +1,13 @@
+/* eslint-disable strict */
+
+"use strict";
+
 const getCoreName = require("corename");
 
 let sorted;
+let unSorted;
 let coreDep;
+let elemAdded;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -9,7 +15,7 @@ let coreDep;
  * @param {string} dep - name of targeted dependency.
  * @returns {boolean}
  */
-function isAddedToSorted(dep) {
+function isDepInSorted(dep) {
   /**
    * Check if dependency already added, using name package matching.
    */
@@ -18,91 +24,134 @@ function isAddedToSorted(dep) {
 }
 
 /**
- * Checks if given package should be added to sorted array.
- *
- * If package dependencies doesn't matched coreDep, then returns true. It
- * should be added because it's neutral.
- *
- * Otherwise, checks, if it exists before, then true to add it, if not false.
- * Because we should add the essential dependency first.
+ * Checks if given package has decency in coreDep.
  *
  * @param {Object} packageDeps
- * @returns {boolean}
+ *
+ * @returns {Object} result
+ * @returns {boolean} result.hasCoreDep
+ * @returns {Object} result.dep
  */
-function isAddPackage(packageDeps) {
-  let isAdd = true;
+function isPackageNeedCoreDep(packageDeps) {
+  let hasCoreDep = false;
+  let dep;
 
   const packageDepsArr = Object.keys(packageDeps);
 
   for (let i = 0; i < packageDepsArr.length; i += 1) {
-    const dep = packageDepsArr[i];
+    dep = packageDepsArr[i];
 
-    if (dep.includes(coreDep)) {
-      isAdd = isAddedToSorted(dep);
+    hasCoreDep = dep.includes(coreDep);
 
-      if (isAdd) break;
-    }
+    if (hasCoreDep) break;
   }
 
-  return isAdd;
+  return { hasCoreDep, dep };
+}
+
+/**
+ * Adds package at(index) to sorted or inSorted.
+ *
+ * @param {Array} packages - packages in workspace.
+ * @param {number} at - index
+ * @param {boolean} isSorted -
+ */
+function addTo(packages, at, isSorted) {
+  const target = isSorted ? sorted : unSorted;
+
+  target.push(packages[at]);
+
+  /**
+   *  remove it from packages so it won't be checked next time.
+   */
+  packages.splice(at, 1);
+
+  elemAdded += 1;
 }
 
 /**
  * Loop into packages. Add package that don't require coreDep first, then add
  * coreDep, then other packages.
+ *
+ * @param {Array} packages - packages in workspace.
  */
 function sort(packages) {
-  let noChange = false;
-  packages.forEach(({ dependencies = {} }, i) => {
+  let isAddToSorted = false;
+
+  let hasCoreDep = false;
+  let dep = {};
+
+  for (let i = 0; i < packages.length; i += 1) {
+    const pkg = packages[i];
+
+    const { dependencies } = pkg;
+
+    ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
+
     /**
-     * Checks if this package is already existed in sorted array or even has
-     * coreDep
+     * When to add package to sorted?
+     * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
+     * - Not natural, but its core dep is already added.
      */
-    const isAdd = isAddPackage(dependencies, coreDep);
+    isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
-    if (isAdd) {
-      sorted.push(packages[i]);
+    if (isAddToSorted) {
+      addTo(packages, i, true);
 
-      /**
-       *  remove it from unsorted
-       */
-      packages.splice(i, 1);
-
-      noChange = true;
+      break;
     }
-  });
+  }
 
-  return noChange;
+  /**
+   * Has hasCoreDep but couldn't add it.
+   * - Add it to unsorted.
+   * - remove it form packages.
+   */
+  if (!isAddToSorted && hasCoreDep) {
+    addTo(packages, 0, false);
+  }
 }
 
 /**
  * Sorting packages. Package with no deps will come first, then package that
  * depending of package that is built. This is essential for monorepo build.
  *
- * @param {Array} packages - contains dependencies for each package in workspace.
+ * @param {*} [packages=[]] - packages in workspace.
  * @param {string} coreDependency - core package that other packages depend on.
- * @returns {Array} - Sorted Array.
+ *
+ * @returns {Object} result
+ * @returns {Array} result.sorted
+ * @returns {Array} result.unSorted
  */
 function packageSorter(packages = [], coreDependency) {
+  unSorted = [];
+
   /**
    * Nothing to sort when:
    *  1- have only one package.
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length <= 1) return packages;
+  if (packages.length <= 1) return { sorted: packages, unSorted };
 
   coreDep = coreDependency || getCoreName(packages);
 
-  if (!coreDep) return packages;
+  if (!coreDep) return { sorted: packages, unSorted };
 
+  const totalLength = packages.length;
   sorted = [];
-  while (packages.length > 0) {
-    const noChange = sort(packages);
-    if (!noChange) break;
+
+  elemAdded = 0;
+
+  while (sorted.length < totalLength) {
+    sort(packages);
+
+    if (elemAdded === totalLength) {
+      break;
+    }
   }
 
-  return sorted;
+  return { sorted, unSorted };
 }
 
 module.exports = packageSorter;
