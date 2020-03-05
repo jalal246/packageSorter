@@ -112,12 +112,12 @@ function sort(packages) {
  * Sorting packages. Package with no deps will come first, then package that
  * depending of package that is built. This is essential for monorepo build.
  *
- * @param {Array} packages - packages in workspace.
+ * @param {*} [packages=[]] - packages in workspace.
  * @param {string} coreDependency - core package that other packages depend on.
  *
  * @returns {Object} result
- * @returns {boolean} result.sorted
- * @returns {Object} result.unSorted
+ * @returns {Array} result.sorted
+ * @returns {Array} result.unSorted
  */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
