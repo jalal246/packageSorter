@@ -141,12 +141,12 @@ const { sorted } = sortPackages(packages);
 
 - [get-info](https://github.com/jalal246/get-info) - Utility functions for projects production.
 
-### Tests
+### Test
 
 ```sh
 npm test
 ```
 
-## License
+### License
 
 This project is licensed under the [GPL-3.0 License](https://github.com/jalal246/packageSorter/blob/master/LICENSE)
