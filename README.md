@@ -130,7 +130,18 @@ const { sorted } = sortPackages(packages);
 // unSorted: [pkg2]
 ```
 
-## Tests
+### Related projects
+
+- [move-position](https://github.com/jalal246/move-position) - Moves element
+  index in given array from position A to B.
+
+- [builderz](https://github.com/jalal246/builderz) - Building your project with zero config.
+
+- [corename](https://github.com/jalal246/corename) - Extracts package name.
+
+- [get-info](https://github.com/jalal246/get-info) - Utility functions for projects production.
+
+### Tests
 
 ```sh
 npm test
