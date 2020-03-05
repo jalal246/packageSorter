@@ -1,3 +1,7 @@
+/* eslint-disable strict */
+
+"use strict";
+
 const getCoreName = require("corename");
 
 let sorted;
