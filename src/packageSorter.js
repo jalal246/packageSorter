@@ -118,7 +118,7 @@ function sort(packages) {
  * @returns {Object} result
  * @returns {boolean} result.sorted
  * @returns {Object} result.unSorted
- * */
+ */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
 
