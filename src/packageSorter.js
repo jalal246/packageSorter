@@ -5,9 +5,11 @@
 const getCoreName = require("corename");
 
 let sorted;
+let sortingMap;
 let unSorted;
 let coreDep;
 let elemAdded;
+let indexesAdded;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -59,12 +61,15 @@ function isPackageNeedCoreDep(packageDeps) {
 function addTo(packages, at, isSorted) {
   const target = isSorted ? sorted : unSorted;
 
-  target.push(packages[at]);
+  const to = target.push(packages[at]) - 1;
+  indexesAdded[at] = true;
 
-  /**
-   *  remove it from packages so it won't be checked next time.
-   */
-  packages.splice(at, 1);
+  if (isSorted) {
+    sortingMap.push({
+      from: at,
+      to
+    });
+  }
 
   elemAdded += 1;
 }
@@ -81,24 +86,30 @@ function sort(packages) {
   let hasCoreDep = false;
   let dep = {};
 
+  let lastI = 0;
+
   for (let i = 0; i < packages.length; i += 1) {
-    const pkg = packages[i];
+    if (!indexesAdded[i]) {
+      const pkg = packages[i];
 
-    const { dependencies } = pkg;
+      const { dependencies } = pkg;
 
-    ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
+      ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
 
-    /**
-     * When to add package to sorted?
-     * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
-     * - Not natural, but its core dep is already added.
-     */
-    isAddToSorted = !hasCoreDep || isDepInSorted(dep);
+      /**
+       * When to add package to sorted?
+       * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
+       * - Not natural, but its core dep is already added.
+       */
+      isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
-    if (isAddToSorted) {
-      addTo(packages, i, true);
+      if (isAddToSorted) {
+        addTo(packages, i, true);
 
-      break;
+        break;
+      }
+
+      lastI = i;
     }
   }
 
@@ -108,7 +119,7 @@ function sort(packages) {
    * - remove it form packages.
    */
   if (!isAddToSorted && hasCoreDep) {
-    addTo(packages, 0, false);
+    addTo(packages, lastI, false);
   }
 }
 
@@ -120,11 +131,14 @@ function sort(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  *
  * @returns {Object} result
- * @returns {Array} result.sorted
- * @returns {Array} result.unSorted
+ * @returns {Array} result.sorted - all sorted packages
+ * @returns {{form: number, to: number}[]} result.sortingMap- indexes change due to sorting
+ * @returns {Array} result.unSorted - packages unsortable
  */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
+  sortingMap = [];
+  indexesAdded = {};
 
   /**
    * Nothing to sort when:
@@ -132,26 +146,48 @@ function packageSorter(packages = [], coreDependency) {
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length <= 1) return { sorted: packages, unSorted };
+  if (packages.length <= 1)
+    return {
+      sorted: packages,
+      unSorted,
+      sortingMap
+    };
 
   coreDep = coreDependency || getCoreName(packages);
 
-  if (!coreDep) return { sorted: packages, unSorted };
+  /**
+   * TODO: sortingMap should not be empty
+   */
+  if (!coreDep)
+    return {
+      sorted: packages,
+      unSorted,
+      sortingMap
+    };
 
   const totalLength = packages.length;
   sorted = [];
 
   elemAdded = 0;
 
+  let i = 0;
+
   while (sorted.length < totalLength) {
     sort(packages);
+    i += 1;
+
+    if (i === 10) break;
 
     if (elemAdded === totalLength) {
       break;
     }
   }
 
-  return { sorted, unSorted };
+  return {
+    sorted,
+    unSorted,
+    sortingMap
+  };
 }
 
 module.exports = packageSorter;
