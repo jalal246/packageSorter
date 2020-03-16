@@ -1,10 +1,11 @@
 # Package Sorter
 
-> A function sorts a group of packages that depends on each other :nerd_face:
+> Sorting a group of packages that depends on each other :nerd_face:
 
-When you have projects depend on each other. You have to build core first, then
-the project depends on it, and so on. You probably want this step to be automated
-so you can use `package-sorter(unsortedPackages[], coreDependency)`.
+Having multiple projects in workspace depending on each other is headache. You
+have to build core first, then the project depends on it, and so on. You
+probably want this step to be automated so you can use
+`package-sorter(unsortedPackages[], coreDependency)`.
 
 ```bash
 npm install package-sorter
