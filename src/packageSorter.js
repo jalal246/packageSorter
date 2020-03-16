@@ -9,8 +9,7 @@ let sortingMap;
 let unSorted;
 let coreDep;
 let elemAdded;
-
-let indexes;
+let indexesAdded;
 
 /**
  * Checks if targeted dependency is already added to sorted array.
@@ -63,6 +62,7 @@ function addTo(packages, at, isSorted) {
   const target = isSorted ? sorted : unSorted;
 
   const to = target.push(packages[at]) - 1;
+  indexesAdded[at] = true;
 
   if (isSorted) {
     sortingMap.push({
@@ -86,8 +86,10 @@ function sort(packages) {
   let hasCoreDep = false;
   let dep = {};
 
+  let lastI = 0;
+
   for (let i = 0; i < packages.length; i += 1) {
-    if (!indexes[i]) {
+    if (!indexesAdded[i]) {
       const pkg = packages[i];
 
       const { dependencies } = pkg;
@@ -102,12 +104,12 @@ function sort(packages) {
       isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
       if (isAddToSorted) {
-        indexes[i] = true;
-
         addTo(packages, i, true);
 
         break;
       }
+
+      lastI = i;
     }
   }
 
@@ -117,7 +119,7 @@ function sort(packages) {
    * - remove it form packages.
    */
   if (!isAddToSorted && hasCoreDep) {
-    addTo(packages, 0, false);
+    addTo(packages, lastI, false);
   }
 }
 
@@ -135,7 +137,7 @@ function sort(packages) {
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
   sortingMap = [];
-  indexes = {};
+  indexesAdded = {};
 
   /**
    * Nothing to sort when:

@@ -156,7 +156,6 @@ describe("sortPackages test", () => {
     ]);
   });
 
-  // bug here:
   it("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
       name: "@folo/withcontext",
@@ -181,10 +180,9 @@ describe("sortPackages test", () => {
 
     const packages = [pkg10, pkg11, pkg12];
     const { sorted, unSorted } = sortPackages(packages, "@folo");
-    console.log("unSorted", unSorted);
 
     expect(sorted.length).to.be.equal(0);
-    expect(unSorted).to.have.ordered.members([pkg10, pkg11, pkg12]);
+    expect(unSorted).to.have.ordered.members([pkg12, pkg11, pkg10]);
   });
 
   it("returns only packages that able to sort them, ignore the other", () => {
