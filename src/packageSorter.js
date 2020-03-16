@@ -5,6 +5,7 @@
 const getCoreName = require("corename");
 
 let sorted;
+let sortingMap;
 let unSorted;
 let coreDep;
 let elemAdded;
@@ -64,7 +65,14 @@ function addTo(packages, at, isSorted) {
   /**
    *  remove it from packages so it won't be checked next time.
    */
-  packages.splice(at, 1);
+  const from = packages.splice(at, 1);
+
+  if (isSorted) {
+    sortingMap.push({
+      from: from,
+      to: at
+    });
+  }
 
   elemAdded += 1;
 }
