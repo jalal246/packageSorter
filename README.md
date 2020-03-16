@@ -2,10 +2,9 @@
 
 > Sorting a group of packages that depends on each other :nerd_face:
 
-Having multiple projects in workspace depending on each other is headache. You
+Having multiple projects in workspace depending on each other is a headache. You
 have to build core first, then the project depends on it, and so on. You
-probably want this step to be automated so you can use
-`package-sorter(unsortedPackages[], coreDependency)`.
+probably want this step to be automated so you can use: `package-sorter`
 
 ```bash
 npm install package-sorter
