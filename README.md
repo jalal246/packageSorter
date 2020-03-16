@@ -146,7 +146,10 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
 - [corename](https://github.com/jalal246/corename) - Extracts package name.
 
-- [get-info](https://github.com/jalal246/get-info) - Utility functions for projects production.
+- [get-info](https://github.com/jalal246/get-info) - Utility functions for
+  projects production.
+
+- [textics](https://github.com/jalal246/textics) & [textics-stream](https://github.com/jalal246/textics-stream) - Counts lines, words, chars and spaces for a given string.
 
 ### Test
 
