@@ -34,7 +34,7 @@ const pkgFoloForms = {
 };
 
 describe("sortPackages test", () => {
-  it("sorts all packages with given core dependency", () => {
+  it.only("sorts all packages with given core dependency", () => {
     const packages = [
       pkgFoloValues,
       pkgFoloUtils,
@@ -42,7 +42,7 @@ describe("sortPackages test", () => {
       pkgFoloContext,
       pkgFoloForms
     ];
-    const { sorted, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, unSorted, sortingMap } = sortPackages(packages, "@folo");
 
     const expectedResult = [
       pkgFoloUtils,
@@ -53,7 +53,17 @@ describe("sortPackages test", () => {
     ];
 
     expect(sorted).to.have.ordered.members(expectedResult);
+
+    // all sorted, so unSorted is empty
     expect(unSorted.length).to.be.equal(0);
+
+    expect(sortingMap).to.be.deep.equal([
+      { from: 1, to: 0 },
+      { from: 3, to: 1 },
+      { from: 0, to: 2 },
+      { from: 2, to: 3 },
+      { from: 4, to: 4 }
+    ]);
   });
 
   it("it extracts core dependency if not passed by default then sorts", () => {

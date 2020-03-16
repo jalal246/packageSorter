@@ -10,6 +10,8 @@ let unSorted;
 let coreDep;
 let elemAdded;
 
+let indexes;
+
 /**
  * Checks if targeted dependency is already added to sorted array.
  *
@@ -60,17 +62,12 @@ function isPackageNeedCoreDep(packageDeps) {
 function addTo(packages, at, isSorted) {
   const target = isSorted ? sorted : unSorted;
 
-  target.push(packages[at]);
-
-  /**
-   *  remove it from packages so it won't be checked next time.
-   */
-  const from = packages.splice(at, 1);
+  const to = target.push(packages[at]) - 1;
 
   if (isSorted) {
     sortingMap.push({
-      from: from,
-      to: at
+      from: at,
+      to
     });
   }
 
@@ -90,23 +87,27 @@ function sort(packages) {
   let dep = {};
 
   for (let i = 0; i < packages.length; i += 1) {
-    const pkg = packages[i];
+    if (!indexes[i]) {
+      const pkg = packages[i];
 
-    const { dependencies } = pkg;
+      const { dependencies } = pkg;
 
-    ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
+      ({ hasCoreDep, dep } = isPackageNeedCoreDep(dependencies));
 
-    /**
-     * When to add package to sorted?
-     * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
-     * - Not natural, but its core dep is already added.
-     */
-    isAddToSorted = !hasCoreDep || isDepInSorted(dep);
+      /**
+       * When to add package to sorted?
+       * - Neutral. Doesn't have hasCoreDep, then add it to sorted.
+       * - Not natural, but its core dep is already added.
+       */
+      isAddToSorted = !hasCoreDep || isDepInSorted(dep);
 
-    if (isAddToSorted) {
-      addTo(packages, i, true);
+      if (isAddToSorted) {
+        indexes[i] = true;
 
-      break;
+        addTo(packages, i, true);
+
+        break;
+      }
     }
   }
 
@@ -133,6 +134,8 @@ function sort(packages) {
  */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
+  sortingMap = [];
+  indexes = {};
 
   /**
    * Nothing to sort when:
@@ -151,15 +154,20 @@ function packageSorter(packages = [], coreDependency) {
 
   elemAdded = 0;
 
+  let i = 0;
+
   while (sorted.length < totalLength) {
     sort(packages);
+    i += 1;
+
+    if (i === 10) break;
 
     if (elemAdded === totalLength) {
       break;
     }
   }
 
-  return { sorted, unSorted };
+  return { sorted, unSorted, sortingMap };
 }
 
 module.exports = packageSorter;
