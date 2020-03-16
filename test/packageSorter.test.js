@@ -34,7 +34,7 @@ const pkgFoloForms = {
 };
 
 describe("sortPackages test", () => {
-  it.only("sorts all packages with given core dependency", () => {
+  it("sorts all packages with given core dependency", () => {
     const packages = [
       pkgFoloValues,
       pkgFoloUtils,
@@ -57,6 +57,7 @@ describe("sortPackages test", () => {
     // all sorted, so unSorted is empty
     expect(unSorted.length).to.be.equal(0);
 
+    // checking sorting map
     expect(sortingMap).to.be.deep.equal([
       { from: 1, to: 0 },
       { from: 3, to: 1 },
@@ -77,7 +78,7 @@ describe("sortPackages test", () => {
       pkgFoloContext,
       pkgFoloForms
     ];
-    const { sorted, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
 
     const expectedResult = [
       pkgFoloUtils,
@@ -89,6 +90,13 @@ describe("sortPackages test", () => {
 
     expect(sorted).to.have.ordered.members(expectedResult);
     expect(unSorted.length).to.be.equal(0);
+    expect(sortingMap).to.be.deep.equal([
+      { from: 1, to: 0 },
+      { from: 3, to: 1 },
+      { from: 0, to: 2 },
+      { from: 2, to: 3 },
+      { from: 4, to: 4 }
+    ]);
   });
 
   it("sorts all mixed-package some sortable, others don't have related core dep", () => {
@@ -125,7 +133,7 @@ describe("sortPackages test", () => {
       pkgUN3
     ];
 
-    const { sorted, unSorted } = sortPackages(packages);
+    const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
     const expectedResult = [
       pkgFoloUtils,
@@ -138,25 +146,17 @@ describe("sortPackages test", () => {
 
     expect(sorted).to.have.ordered.members(expectedResult);
     expect(unSorted.length).to.be.equal(0);
+    expect(sortingMap).to.be.deep.equal([
+      { from: 0, to: 0 },
+      { from: 1, to: 1 },
+      { from: 3, to: 2 },
+      { from: 4, to: 3 },
+      { from: 2, to: 4 },
+      { from: 5, to: 5 }
+    ]);
   });
 
-  // it("it sorts packages and associated arrays", () => {
-  //   /**
-  //    * Same as above but without passing core dep.
-  //    */
-  //   const packages = [pkgFoloValues, pkgFoloContext, pkgFoloForms];
-
-  //   const distPath = ["1", "0", "4"];
-  //   const result = sortPackages(packages, null, [distPath]);
-  //   // console.log("result", result);
-
-  //   const expectedResult = [pkgFoloContext, pkgFoloValues, pkgFoloForms];
-  //   // console.log("distPath", distPath);
-
-  //   expect(result).to.have.ordered.members(expectedResult);
-  //   // expect(distPath).to.have.ordered.members(["0", "1", "4"]);
-  // });
-
+  // bug here:
   it("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
       name: "@folo/withcontext",
@@ -181,6 +181,7 @@ describe("sortPackages test", () => {
 
     const packages = [pkg10, pkg11, pkg12];
     const { sorted, unSorted } = sortPackages(packages, "@folo");
+    console.log("unSorted", unSorted);
 
     expect(sorted.length).to.be.equal(0);
     expect(unSorted).to.have.ordered.members([pkg10, pkg11, pkg12]);
