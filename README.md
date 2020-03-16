@@ -18,16 +18,20 @@ npm install package-sorter
  * @param {string} coreDependency - core package that other packages depends on it.
  *
  * @returns {Object} result
- * @returns {Array} result.sorted
- * @returns {Array} result.unSorted
+ * @returns {Array} result.sorted - all sorted packages
+ * @returns {{form: number, to: number}[]} result.sortingMap- map of indexes change due to sorting
+ * @returns {Array} result.unSorted - packages unsortable
  */
-const { sorted, unSorted } = packageSorter(packages, coreDependency);
+const { sorted, sortingMap, unSorted } = packageSorter(
+  packages,
+  coreDependency
+);
 ```
 
 If `coreDependency` is not passed, `package-sorter` will extract it following
 monorepo naming pattern as: `@coreDep/`
 
-> Why returns `unSorted`?
+> `unSorted`
 > Just in case, packages are missing the main dependency will be added to
 > unSorted. Then you can figure out what's missing before production.
 
@@ -59,9 +63,10 @@ const pkg2 = {
 const packages = [pkg2, pkg1, pkg0];
 
 // our core dependency in this case is: @folo.
-const { sorted, unSorted } = sortPackages(packages, "@folo");
+const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
 
 // sorted: [pkg0, pkg1, pkg2];
+// sortingMap: [ { from: 2, to: 0 }, { from: 1, to: 1 }, { from: 0, to: 2 } ]
 // unSorted: []
 ```
 
@@ -91,9 +96,10 @@ const pkg2 = {
 const packages = [pkg2, pkg1, pkg0];
 
 // let's the function get core dependency.
-const { sorted } = sortPackages(packages);
+const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
 // sorted: [pkg2, pkg0, pkg1]
+// sortingMap: [ { from: 0, to: 0 }, { from: 2, to: 1 }, { from: 1, to: 2 } ]
 // unSorted: []
 ```
 
@@ -124,9 +130,10 @@ const pkg2 = {
 
 const packages = [pkg2, pkg1, pkg0];
 
-const { sorted } = sortPackages(packages);
+const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
 // sorted: [pkg0, pkg1]
+// sortingMap: [ { from: 2, to: 0 }, { from: 1, to: 1 } ]
 // unSorted: [pkg2]
 ```
 

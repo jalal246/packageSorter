@@ -131,8 +131,9 @@ function sort(packages) {
  * @param {string} coreDependency - core package that other packages depend on.
  *
  * @returns {Object} result
- * @returns {Array} result.sorted
- * @returns {Array} result.unSorted
+ * @returns {Array} result.sorted - all sorted packages
+ * @returns {{form: number, to: number}[]} result.sortingMap- indexes change due to sorting
+ * @returns {Array} result.unSorted - packages unsortable
  */
 function packageSorter(packages = [], coreDependency) {
   unSorted = [];
