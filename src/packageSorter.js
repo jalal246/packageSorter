@@ -34,7 +34,7 @@ function isDepInSorted(dep) {
  * @returns {boolean} result.hasCoreDep
  * @returns {Object} result.dep
  */
-function isPackageNeedCoreDep(packageDeps) {
+function isPackageNeedCoreDep(packageDeps = {}) {
   let hasCoreDep = false;
   let dep;
 
