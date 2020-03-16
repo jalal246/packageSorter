@@ -55,7 +55,7 @@ describe("sortPackages test", () => {
     expect(sorted).to.have.ordered.members(expectedResult);
 
     // all sorted, so unSorted is empty
-    expect(unSorted.length).to.be.equal(0);
+    expect(unSorted).to.be.deep.equal([]);
 
     // checking sorting map
     expect(sortingMap).to.be.deep.equal([
@@ -89,7 +89,7 @@ describe("sortPackages test", () => {
     ];
 
     expect(sorted).to.have.ordered.members(expectedResult);
-    expect(unSorted.length).to.be.equal(0);
+    expect(unSorted).to.be.deep.equal([]);
     expect(sortingMap).to.be.deep.equal([
       { from: 1, to: 0 },
       { from: 3, to: 1 },
@@ -145,7 +145,7 @@ describe("sortPackages test", () => {
     ];
 
     expect(sorted).to.have.ordered.members(expectedResult);
-    expect(unSorted.length).to.be.equal(0);
+    expect(unSorted).to.be.deep.equal([]);
     expect(sortingMap).to.be.deep.equal([
       { from: 0, to: 0 },
       { from: 1, to: 1 },
@@ -179,10 +179,11 @@ describe("sortPackages test", () => {
     };
 
     const packages = [pkg10, pkg11, pkg12];
-    const { sorted, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
 
-    expect(sorted.length).to.be.equal(0);
+    expect(sorted).to.be.deep.equal([]);
     expect(unSorted).to.have.ordered.members([pkg12, pkg11, pkg10]);
+    expect(sortingMap).to.be.deep.equal([]);
   });
 
   it("returns only packages that able to sort them, ignore the other", () => {
@@ -206,9 +207,13 @@ describe("sortPackages test", () => {
     };
 
     const packages = [pkg20, pkg21, pkg22];
-    const { sorted, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
 
     expect(sorted).to.have.ordered.members([pkg22, pkg21]);
+    expect(sortingMap).to.be.deep.equal([
+      { from: 2, to: 0 },
+      { from: 1, to: 1 }
+    ]);
     expect(unSorted).to.have.ordered.members([pkg20]);
   });
 
@@ -238,9 +243,10 @@ describe("sortPackages test", () => {
     };
     const packages = [pkgUN1, pkgUN2, pkgUN3];
 
-    const { sorted, unSorted } = sortPackages(packages);
+    const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
     expect(sorted).to.have.ordered.members(packages);
-    expect(unSorted.length).to.be.equal(0);
+    expect(sortingMap).to.be.deep.equal([]);
+    expect(unSorted).to.be.deep.equal([]);
   });
 });

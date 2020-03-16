@@ -145,11 +145,24 @@ function packageSorter(packages = [], coreDependency) {
    *  2- can't discover the coreDep (which may be due to packages not depending
    * on each other aka already sorted)
    */
-  if (packages.length <= 1) return { sorted: packages, unSorted };
+  if (packages.length <= 1)
+    return {
+      sorted: packages,
+      unSorted,
+      sortingMap
+    };
 
   coreDep = coreDependency || getCoreName(packages);
 
-  if (!coreDep) return { sorted: packages, unSorted };
+  /**
+   * TODO: sortingMap should not be empty
+   */
+  if (!coreDep)
+    return {
+      sorted: packages,
+      unSorted,
+      sortingMap
+    };
 
   const totalLength = packages.length;
   sorted = [];
@@ -169,7 +182,11 @@ function packageSorter(packages = [], coreDependency) {
     }
   }
 
-  return { sorted, unSorted, sortingMap };
+  return {
+    sorted,
+    unSorted,
+    sortingMap
+  };
 }
 
 module.exports = packageSorter;
