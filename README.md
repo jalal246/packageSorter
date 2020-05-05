@@ -39,7 +39,8 @@ monorepo naming pattern as: `@coreDep/`
 ```js
 import packageSorter from "package-sorter";
 
-// input packages:
+// input packages
+
 const pkg1 = {
   name: "@pkg/first",
   dependencies: {},
@@ -62,7 +63,7 @@ const pkg3 = {
 const packages = [pkg3, pkg2, pkg1];
 
 // our core dependency in this case is: @pkg.
-const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
+const { sorted, sortingMap, unSorted } = packageSorter(packages, "@pkg");
 
 // sorted = [pkg1, pkg2, pkg3];
 
@@ -80,7 +81,8 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
 ```js
 import packageSorter from "package-sorter";
 
-// input packages:
+// input packages
+
 const pkg1 = {
   name: "@pkg/first",
   dependencies: {},
@@ -100,8 +102,8 @@ const pkg3 = {
 
 const packages = [pkg3, pkg2, pkg1];
 
-// let's the function get core dependency (@pkg).
-const { sorted, sortingMap, unSorted } = sortPackages(packages);
+// let the function get core dependency (@pkg) by itself
+const { sorted, sortingMap, unSorted } = packageSorter(packages);
 
 // sorted = [pkg3, pkg1, pkg2];
 
@@ -119,7 +121,8 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages);
 ```js
 import packageSorter from "package-sorter";
 
-// input packages:
+// input packages
+
 const pkg1 = {
   name: "@pkg/first",
   dependencies: {},
@@ -141,7 +144,7 @@ const pkg3 = {
 
 const packages = [pkg3, pkg2, pkg1];
 
-const { sorted, sortingMap, unSorted } = sortPackages(packages);
+const { sorted, sortingMap, unSorted } = packageSorter(packages);
 
 // sorted = [pkg1, pkg2];
 
@@ -168,7 +171,7 @@ This project is licensed under the [GPL-3.0 License](https://github.com/jalal246
 - [move-position](https://github.com/jalal246/move-position) - Moves element
   index in given array from position A to B.
 
-- [builderz](https://github.com/jalal246/builderz) - Building your project with zero config.
+- [builderz](https://github.com/jalal246/builderz) - Zero Configuration JS bundler.
 
 - [corename](https://github.com/jalal246/corename) - Extracts package name.
 
