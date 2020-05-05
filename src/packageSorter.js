@@ -67,7 +67,7 @@ function addTo(packages, at, isSorted) {
   if (isSorted) {
     sortingMap.push({
       from: at,
-      to
+      to,
     });
   }
 
@@ -150,7 +150,7 @@ function packageSorter(packages = [], coreDependency) {
     return {
       sorted: packages,
       unSorted,
-      sortingMap
+      sortingMap,
     };
 
   coreDep = coreDependency || getCoreName(packages);
@@ -162,7 +162,7 @@ function packageSorter(packages = [], coreDependency) {
     return {
       sorted: packages,
       unSorted,
-      sortingMap
+      sortingMap,
     };
 
   const totalLength = packages.length;
@@ -186,7 +186,7 @@ function packageSorter(packages = [], coreDependency) {
   return {
     sorted,
     unSorted,
-    sortingMap
+    sortingMap,
   };
 }
 

@@ -1,6 +1,6 @@
 # Package Sorter
 
-> Sorting a group of packages that depends on each other :nerd_face:
+> Sorting a group of packages that depends on each other
 
 Having multiple projects in workspace depending on each other is a headache. You
 have to build core first, then the project depends on it, and so on. You
@@ -13,15 +13,18 @@ npm install package-sorter
 ## API
 
 ```js
-/**
- * @param {Array} [packages=[]] - packages in workspace.
- * @param {string} coreDependency - core package that other packages depends on it.
- *
- * @returns {Object} result
- * @returns {Array} result.sorted - all sorted packages
- * @returns {{form: number, to: number}[]} result.sortingMap- map of indexes change due to sorting
- * @returns {Array} result.unSorted - packages unsortable
- */
+packageSorter(packages? Array, coreDependency? string)
+```
+
+Returns result object:
+
+- `sorted: Array <sortedPkgJson>` - all sorted packages in order.
+- `sortingMap: Array <sortingMap>`- map of package sorting contains:
+  - `form: number` - original package index before sorting.
+  - `to: number` - current package index after sorting.
+- `unSorted: Array <unsortedPkgJson>` - unsortable package that's missing dependency.
+
+```js
 const { sorted, sortingMap, unSorted } = packageSorter(
   packages,
   coreDependency
@@ -31,43 +34,45 @@ const { sorted, sortingMap, unSorted } = packageSorter(
 If `coreDependency` is not passed, `package-sorter` will extract it following
 monorepo naming pattern as: `@coreDep/`
 
-> `unSorted`
-> Just in case, packages are missing the main dependency will be added to
-> unSorted. Then you can figure out what's missing before production.
-
 ### Example (1) - All Sorted
 
 ```js
 import packageSorter from "package-sorter";
 
 // input packages:
-const pkg0 = {
-  name: "@folo/withcontext",
-  dependencies: {}
-};
-
 const pkg1 = {
-  name: "@folo/values",
-  dependencies: {
-    "@folo/withcontext": "^0.1.5"
-  }
+  name: "@pkg/first",
+  dependencies: {},
 };
 
 const pkg2 = {
-  name: "@folo/layout",
+  name: "@pkg/second",
   dependencies: {
-    "@folo/values": "^0.1.5"
-  }
+    "@pkg/first": "^0.1.5",
+  },
 };
 
-const packages = [pkg2, pkg1, pkg0];
+const pkg3 = {
+  name: "@pkg/third",
+  dependencies: {
+    "@pkg/second": "^0.1.5",
+  },
+};
 
-// our core dependency in this case is: @folo.
-const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
+const packages = [pkg3, pkg2, pkg1];
 
-// sorted: [pkg0, pkg1, pkg2];
-// sortingMap: [ { from: 2, to: 0 }, { from: 1, to: 1 }, { from: 0, to: 2 } ]
-// unSorted: []
+// our core dependency in this case is: @pkg.
+const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
+
+// sorted = [pkg1, pkg2, pkg3];
+
+// sortingMap = [
+//   { from: 2, to: 0 },
+//   { from: 1, to: 1 },
+//   { from: 0, to: 2 },
+// ];
+
+// unSorted = [];
 ```
 
 ### Example (2) - Mixed Packages
@@ -76,31 +81,37 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
 import packageSorter from "package-sorter";
 
 // input packages:
-const pkg0 = {
-  name: "@folo/withcontext",
-  dependencies: {}
-};
-
 const pkg1 = {
-  name: "@folo/values",
-  dependencies: {
-    "@folo/withcontext": "^0.1.5"
-  }
+  name: "@pkg/first",
+  dependencies: {},
 };
 
 const pkg2 = {
-  name: "unrelated",
-  dependencies: {}
+  name: "@pkg/second",
+  dependencies: {
+    "@pkg/first": "^0.1.5",
+  },
 };
 
-const packages = [pkg2, pkg1, pkg0];
+const pkg3 = {
+  name: "unrelated",
+  dependencies: {},
+};
 
-// let's the function get core dependency.
+const packages = [pkg3, pkg2, pkg1];
+
+// let's the function get core dependency (@pkg).
 const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
-// sorted: [pkg2, pkg0, pkg1]
-// sortingMap: [ { from: 0, to: 0 }, { from: 2, to: 1 }, { from: 1, to: 2 } ]
-// unSorted: []
+// sorted = [pkg3, pkg1, pkg2];
+
+// sortingMap = [
+//   { from: 0, to: 0 },
+//   { from: 2, to: 1 },
+//   { from: 1, to: 2 },
+// ];
+
+// unSorted = [];
 ```
 
 ### Example (3) - Some Unsorted
@@ -109,33 +120,48 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages);
 import packageSorter from "package-sorter";
 
 // input packages:
-const pkg0 = {
-  name: "@folo/withcontext",
-  dependencies: {}
-};
-
 const pkg1 = {
-  name: "@folo/values",
-  dependencies: {
-    "@folo/withcontext": "^0.1.5"
-  }
+  name: "@pkg/first",
+  dependencies: {},
 };
 
 const pkg2 = {
-  name: "@folo/unsortable",
+  name: "@pkg/second",
   dependencies: {
-    "@folo/missing": "^0.1.5"
-  }
+    "@pkg/first": "^0.1.5",
+  },
 };
 
-const packages = [pkg2, pkg1, pkg0];
+const pkg3 = {
+  name: "@pkg/unsortable",
+  dependencies: {
+    "@pkg/missing": "^0.1.5",
+  },
+};
+
+const packages = [pkg3, pkg2, pkg1];
 
 const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
-// sorted: [pkg0, pkg1]
-// sortingMap: [ { from: 2, to: 0 }, { from: 1, to: 1 } ]
-// unSorted: [pkg2]
+// sorted = [pkg1, pkg2];
+
+// sortingMap = [
+//   { from: 2, to: 0 },
+//   { from: 1, to: 1 },
+// ];
+
+// unSorted = [pkg3];
 ```
+
+## Test
+
+```sh
+npm test
+```
+
+## License
+
+This project is licensed under the [GPL-3.0 License](https://github.com/jalal246/packageSorter/blob/master/LICENSE)
 
 ### Related projects
 
@@ -149,14 +175,8 @@ const { sorted, sortingMap, unSorted } = sortPackages(packages);
 - [get-info](https://github.com/jalal246/get-info) - Utility functions for
   projects production.
 
-- [textics](https://github.com/jalal246/textics) & [textics-stream](https://github.com/jalal246/textics-stream) - Counts lines, words, chars and spaces for a given string.
+- [textics](https://github.com/jalal246/textics) &
+  [textics-stream](https://github.com/jalal246/textics-stream) - Counts lines,
+  words, chars and spaces for a given string.
 
-### Test
-
-```sh
-npm test
-```
-
-### License
-
-This project is licensed under the [GPL-3.0 License](https://github.com/jalal246/packageSorter/blob/master/LICENSE)
+- [folo](https://github.com/jalal246/folo) - Form & Layout Components Built with React.
