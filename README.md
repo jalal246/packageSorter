@@ -102,7 +102,7 @@ const pkg3 = {
 
 const packages = [pkg3, pkg2, pkg1];
 
-// let the function get core dependency (@pkg) by itself
+// let the function gets core dependency (@pkg) by itself
 const { sorted, sortingMap, unSorted } = packageSorter(packages);
 
 // sorted = [pkg3, pkg1, pkg2];
