@@ -1,56 +1,45 @@
 import { expect } from "chai";
 import sortPackages from "../src";
 
-const pkgFoloContext = {
-  name: "@folo/withcontext",
-  dependencies: {}
+const pkgFirst = {
+  name: "@pkg/first",
+  dependencies: {},
 };
 
-const pkgFoloValues = {
-  name: "@folo/values",
+const pkgSecond = {
+  name: "@pkg/second",
+  dependencies: {},
+};
+
+const pkgThird = {
+  name: "@pkg/third",
   dependencies: {
-    "@folo/withcontext": "^0.1.5"
-  }
+    "@pkg/second": "^0.1.5",
+  },
 };
 
-const pkgFoloUtils = {
-  name: "@folo/utils",
-  dependencies: {}
-};
-
-const pkgFoloLayout = {
-  name: "@folo/layout",
+const pkgFourth = {
+  name: "@pkg/fourth",
   dependencies: {
-    "@folo/withcontext": "^0.1.5"
-  }
+    "@pkg/second": "^0.1.5",
+  },
 };
 
-const pkgFoloForms = {
-  name: "@folo/forms",
+const pkgFifth = {
+  name: "@pkg/fifth",
   dependencies: {
-    "@folo/layout": "^0.1.4",
-    "@folo/values": "^0.1.4"
-  }
+    "@pkg/fourth": "^0.1.4",
+    "@pkg/third": "^0.1.4",
+  },
 };
 
 describe("sortPackages test", () => {
   it("sorts all packages with given core dependency", () => {
-    const packages = [
-      pkgFoloValues,
-      pkgFoloUtils,
-      pkgFoloLayout,
-      pkgFoloContext,
-      pkgFoloForms
-    ];
-    const { sorted, unSorted, sortingMap } = sortPackages(packages, "@folo");
+    const packages = [pkgThird, pkgFirst, pkgFourth, pkgSecond, pkgFifth];
 
-    const expectedResult = [
-      pkgFoloUtils,
-      pkgFoloContext,
-      pkgFoloValues,
-      pkgFoloLayout,
-      pkgFoloForms
-    ];
+    const { sorted, unSorted, sortingMap } = sortPackages(packages, "@pkg");
+
+    const expectedResult = [pkgFirst, pkgSecond, pkgThird, pkgFourth, pkgFifth];
 
     expect(sorted).to.have.ordered.members(expectedResult);
 
@@ -63,7 +52,7 @@ describe("sortPackages test", () => {
       { from: 3, to: 1 },
       { from: 0, to: 2 },
       { from: 2, to: 3 },
-      { from: 4, to: 4 }
+      { from: 4, to: 4 },
     ]);
   });
 
@@ -71,22 +60,11 @@ describe("sortPackages test", () => {
     /**
      * Same as above but without passing core dep.
      */
-    const packages = [
-      pkgFoloValues,
-      pkgFoloUtils,
-      pkgFoloLayout,
-      pkgFoloContext,
-      pkgFoloForms
-    ];
-    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
+    const packages = [pkgThird, pkgFirst, pkgFourth, pkgSecond, pkgFifth];
 
-    const expectedResult = [
-      pkgFoloUtils,
-      pkgFoloContext,
-      pkgFoloValues,
-      pkgFoloLayout,
-      pkgFoloForms
-    ];
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
+
+    const expectedResult = [pkgFirst, pkgSecond, pkgThird, pkgFourth, pkgFifth];
 
     expect(sorted).to.have.ordered.members(expectedResult);
     expect(unSorted).to.be.deep.equal([]);
@@ -95,7 +73,7 @@ describe("sortPackages test", () => {
       { from: 3, to: 1 },
       { from: 0, to: 2 },
       { from: 2, to: 3 },
-      { from: 4, to: 4 }
+      { from: 4, to: 4 },
     ]);
   });
 
@@ -104,44 +82,37 @@ describe("sortPackages test", () => {
       name: "unsortable1",
       dependencies: {
         layout1: "^0.1.4",
-        values1: "^0.1.4"
-      }
+        values1: "^0.1.4",
+      },
     };
 
     const pkgUN2 = {
       name: "unsortable2",
       dependencies: {
         layout2: "^0.1.4",
-        values2: "^0.1.4"
-      }
+        values2: "^0.1.4",
+      },
     };
 
     const pkgUN3 = {
       name: "unsortable3",
       dependencies: {
         layout2: "^0.1.4",
-        values2: "^0.1.4"
-      }
+        values2: "^0.1.4",
+      },
     };
 
-    const packages = [
-      pkgFoloUtils,
-      pkgUN1,
-      pkgFoloValues,
-      pkgUN2,
-      pkgFoloContext,
-      pkgUN3
-    ];
+    const packages = [pkgFirst, pkgUN1, pkgThird, pkgUN2, pkgSecond, pkgUN3];
 
     const { sorted, sortingMap, unSorted } = sortPackages(packages);
 
     const expectedResult = [
-      pkgFoloUtils,
+      pkgFirst,
       pkgUN1,
       pkgUN2,
-      pkgFoloContext,
-      pkgFoloValues,
-      pkgUN3
+      pkgSecond,
+      pkgThird,
+      pkgUN3,
     ];
 
     expect(sorted).to.have.ordered.members(expectedResult);
@@ -152,34 +123,34 @@ describe("sortPackages test", () => {
       { from: 3, to: 2 },
       { from: 4, to: 3 },
       { from: 2, to: 4 },
-      { from: 5, to: 5 }
+      { from: 5, to: 5 },
     ]);
   });
 
   it("returns all unsorted packages that have core dep", () => {
     const pkg10 = {
-      name: "@folo/withcontext",
+      name: "@pkg/second",
       dependencies: {
-        "@folo/eslint": "^0.1.5"
-      }
+        "@pkg/eslint": "^0.1.5",
+      },
     };
 
     const pkg11 = {
-      name: "@folo/values",
+      name: "@pkg/third",
       dependencies: {
-        "@folo/tools": "^0.1.5"
-      }
+        "@pkg/tools": "^0.1.5",
+      },
     };
 
     const pkg12 = {
-      name: "@folo/utils",
+      name: "@pkg/first",
       dependencies: {
-        "@folo/pop": "^0.1.5"
-      }
+        "@pkg/pop": "^0.1.5",
+      },
     };
 
     const packages = [pkg10, pkg11, pkg12];
-    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
 
     expect(sorted).to.be.deep.equal([]);
     expect(unSorted).to.have.ordered.members([pkg12, pkg11, pkg10]);
@@ -188,31 +159,31 @@ describe("sortPackages test", () => {
 
   it("returns only packages that able to sort them, ignore the other", () => {
     const pkg20 = {
-      name: "@folo/withcontext",
+      name: "@pkg/second",
       dependencies: {
-        "@folo/eslint": "^0.1.5"
-      }
+        "@pkg/eslint": "^0.1.5",
+      },
     };
 
     const pkg21 = {
-      name: "@folo/values",
+      name: "@pkg/third",
       dependencies: {
-        "@folo/tools": "^0.1.5"
-      }
+        "@pkg/tools": "^0.1.5",
+      },
     };
 
     const pkg22 = {
-      name: "@folo/tools",
-      dependencies: {}
+      name: "@pkg/tools",
+      dependencies: {},
     };
 
     const packages = [pkg20, pkg21, pkg22];
-    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@folo");
+    const { sorted, sortingMap, unSorted } = sortPackages(packages, "@pkg");
 
     expect(sorted).to.have.ordered.members([pkg22, pkg21]);
     expect(sortingMap).to.be.deep.equal([
       { from: 2, to: 0 },
-      { from: 1, to: 1 }
+      { from: 1, to: 1 },
     ]);
     expect(unSorted).to.have.ordered.members([pkg20]);
   });
@@ -222,24 +193,24 @@ describe("sortPackages test", () => {
       name: "unsortable1",
       dependencies: {
         layout1: "^0.1.4",
-        values1: "^0.1.4"
-      }
+        values1: "^0.1.4",
+      },
     };
 
     const pkgUN2 = {
       name: "unsortable2",
       dependencies: {
         layout2: "^0.1.4",
-        values2: "^0.1.4"
-      }
+        values2: "^0.1.4",
+      },
     };
 
     const pkgUN3 = {
       name: "unsortable3",
       dependencies: {
         layout2: "^0.1.4",
-        values2: "^0.1.4"
-      }
+        values2: "^0.1.4",
+      },
     };
     const packages = [pkgUN1, pkgUN2, pkgUN3];
 
