@@ -1,23 +1,17 @@
 module.exports = {
-  parser: "babel-eslint",
-
   env: {
     browser: true,
-    es6: true
+    commonjs: true,
+    es2021: true,
   },
   extends: ["airbnb-base", "prettier"],
-  globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly"
-  },
   parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: "module"
+    ecmaVersion: 12,
   },
-  rules: {},
   globals: {
     describe: true,
     it: true,
-    expect: true
-  }
+    expect: true,
+  },
+  rules: {},
 };
