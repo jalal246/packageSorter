@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import sortPackages from "../src";
+const { expect } =require("chai");
+const sortPackages  =require( "../src");
 
 const pkgFirst = {
   name: "@pkg/first",
