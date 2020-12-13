@@ -1153,10 +1153,10 @@ core-js-compat@^3.8.0:
     browserslist "^4.15.0"
     semver "7.0.0"
 
-corename@^1.0.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/corename/-/corename-1.1.0.tgz#9e50f5c4b3c809a3661c7f2f6da10564c97cea47"
-  integrity sha512-1DJB9dAU4CBjkylSdzEK2dcxmuCbSucLtOGEbyGrsDH+XMiFe8JnaQRKF2i5VFc3u/j+K2M1qTx7/j0cT6FA2A==
+corename@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/corename/-/corename-1.1.1.tgz#ede213ea065a8fd6d14cf4afd3d71f493ce3b4ad"
+  integrity sha512-JuLaArpI2VTRNdPxCMzpvfvqIdGr/9yW4ZkG04OfR4jOj91ISel+or+McMoyPXEOWjhBL/LKjIivZPVDwUfJCw==
 
 cross-spawn@^7.0.2:
   version "7.0.3"
