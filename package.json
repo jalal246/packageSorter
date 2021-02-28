@@ -12,7 +12,7 @@
     "corename": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.13",
+    "@babel/core": "^7.13.8",
     "@babel/preset-env": "^7.12.11",
     "@babel/register": "^7.8.3",
     "chai": "^4.3.0",
